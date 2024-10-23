@@ -51,8 +51,7 @@ printint(int xx, int base, int sign)
 //PAGEBREAK: 50
 
 // Print to the console. only understands %d, %x, %p, %s.
-void
-cprintf(char *fmt, ...)
+void cprintf(char const*fmt, ...)
 {
   int i, c, locking;
   uint *argp;
@@ -103,8 +102,7 @@ cprintf(char *fmt, ...)
     release(&cons.lock);
 }
 
-void
-panic(char *s)
+void panic(char const*s)
 {
   int i;
   uint pcs[10];

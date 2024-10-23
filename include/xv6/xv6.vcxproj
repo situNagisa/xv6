@@ -19,26 +19,46 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="concurrency\detail\environment.h" />
+    <ClInclude Include="concurrency\detail\spinlock.h" />
+    <ClInclude Include="concurrency\environment.h" />
     <ClInclude Include="environment.h" />
-    <ClInclude Include="kernel\environment.h" />
-    <ClInclude Include="kernel\memmod.h" />
-    <ClInclude Include="kernel\memmod\detail\address.h" />
-    <ClInclude Include="kernel\memmod\detail\page.h" />
-    <ClInclude Include="kernel\memmod\detail\page\address.h" />
-    <ClInclude Include="kernel\memmod\detail\page\directory.h" />
-    <ClInclude Include="kernel\memmod\detail\page\environment.h" />
-    <ClInclude Include="kernel\memmod\detail\page\table.h" />
-    <ClInclude Include="kernel\memmod\detail\environment.h" />
-    <ClInclude Include="kernel\memmod\detail\bit_literal.h" />
-    <ClInclude Include="kernel\memmod\detail\page\page.h" />
-    <ClInclude Include="kernel\memmod\environment.h" />
-    <ClInclude Include="kernel\memmod\export.h" />
-    <ClInclude Include="kernel\memmod\memmod.h" />
+    <ClInclude Include="memmod.h" />
+    <ClInclude Include="page\detail\allocator.h" />
+    <ClInclude Include="page\detail\entry.h" />
+    <ClInclude Include="page\detail\kernel_transformer.h" />
+    <ClInclude Include="page\detail\page.h" />
+    <ClInclude Include="page\detail\primary.h" />
+    <ClInclude Include="page\detail\secondary.h" />
+    <ClInclude Include="page\detail\environment.h" />
+    <ClInclude Include="page\environment.h" />
+    <ClInclude Include="page\export.h" />
+    <ClInclude Include="page\page.h" />
+    <ClInclude Include="_page\detail\basic\kernel_transformer.h" />
+    <ClInclude Include="_page\detail\basic\primary.h" />
+    <ClInclude Include="_page\detail\basic\entry.h" />
+    <ClInclude Include="_page\detail\basic\environment.h" />
+    <ClInclude Include="_page\detail\basic\page.h" />
+    <ClInclude Include="_page\detail\basic\secondary.h" />
+    <ClInclude Include="_page\detail\environment.h" />
+    <ClInclude Include="_page\detail\basic\table.h" />
+    <ClInclude Include="_page\_detail\address_transformer.h" />
+    <ClInclude Include="_page\_detail\allocator.h" />
+    <ClInclude Include="_page\_detail\directory.h" />
+    <ClInclude Include="_page\_detail\environment.h" />
+    <ClInclude Include="_page\_detail\free_list.h" />
+    <ClInclude Include="_page\_detail\layout.h" />
+    <ClInclude Include="_page\_detail\space.h" />
+    <ClInclude Include="_page\_detail\table.h" />
+    <ClInclude Include="_page\_detail\table_holder.h" />
+    <ClInclude Include="_page\environment.h" />
+    <ClInclude Include="_page\export.h" />
+    <ClInclude Include="_page\page.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c8d99f86-e4a9-454d-996f-8122230357aa}</ProjectGuid>
+    <ProjectGuid>{6DA0425A-C3EF-4FCB-9642-DBDE95FAA1D6}</ProjectGuid>
     <RootNamespace>boot</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>xv6</ProjectName>
@@ -96,6 +116,10 @@
     <Import Project="..\..\extern\fast_io.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>

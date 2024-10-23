@@ -1,8 +1,8 @@
 import os
 
-current_c_flags = f"-fno-pic -static -fno-builtin -fno-strict-aliasing -Os -m32 -fno-omit-frame-pointer -fno-exceptions -fno-stack-protector -fno-stack-protector -fno-pie -no-pie"
+current_c_flags = f"-fno-pic -static -fno-builtin -Os -m32 -fno-omit-frame-pointer -fno-exceptions -fno-stack-protector -fno-pie -no-pie"
 current_ld_flags = f""
-current_dir = os.path.dirname(os.path.abspath(__file__))
+current_dir = os.path.relpath(os.path.dirname(os.path.abspath(__file__)), os.curdir)
 
 def bootasm(project_root:str, compiler:str, flags:str, output_dir:str) -> str:
 	output_file = f"{output_dir}/bootasm"

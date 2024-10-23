@@ -4,7 +4,6 @@ import kernel.make as kernel_maker
 import fs.make as fs_maker
 import argparse
 import time
-
 import subprocess
 
 def check_gcc_option(option):
@@ -16,15 +15,50 @@ def check_gcc_option(option):
         return False
 
 project_root = os.path.relpath(os.path.dirname(os.path.abspath(__file__)), os.curdir)
-cc = "x86_64-elf-gcc"
-cxx = "x86_64-elf-g++"
-linker = "x86_64-elf-ld"
-objdump = "x86_64-elf-objdump"
-objcopy = "x86_64-elf-objcopy"
 
-current_c_flags = f"-fno-strict-aliasing -m32 -Wno-error"
-current_cxx_flags = f"{current_c_flags} -std=c++26 -fno-exceptions -fno-rtti -I{os.environ.get("FAST_IO_ROOT")}/include -I{os.environ.get("NAGISA_ROOT")}/include -I{os.environ.get("VCPKG_ROOT")}/installed/x64-windows/include"
-current_ld_flags = f"-m elf_i386" + ('--no-warn-rwx-segments' if check_gcc_option('--no-warn-rwx-segments') else '')
+class gcc_toolchain:
+	def __init__(self, root:str):
+		self._root:str = root
+		self._dump_machine:str = ""
+		for f in os.listdir(os.path.join(self._root, "bin")):
+			if f.find("gcc") == -1:
+				continue
+			result = subprocess.run([f"{self._root}/bin/{f}", "-dumpmachine"], capture_output=True, text=True)
+			self._dump_machine = result.stdout.strip()
+	
+	def root(self) -> str:
+		return self._root
+	def dump_machine(self) -> str:
+		return self._dump_machine
+	
+	def prefix(self) -> str:
+		return f"{self._dump_machine}-"
+	
+	def cc(self) -> str:
+		return f"{self._root}/bin/{self.prefix()}gcc"
+	def cxx(self) -> str:
+		return f"{self._root}/bin/{self.prefix()}g++"
+	def linker(self) -> str:
+		return f"{self._root}/bin/{self.prefix()}ld"
+	def objdump(self) -> str:
+		return f"{self._root}/bin/{self.prefix()}objdump"
+	def objcopy(self) -> str:
+		return f"{self._root}/bin/{self.prefix()}objcopy"
+	
+prefix = os.environ.get("TOOLCHAIN_PREFIX") or ""
+cc = f"{prefix}gcc"
+cxx = f"{prefix}g++"
+linker = f"{prefix}ld"
+objdump = f"{prefix}objdump"
+objcopy = f"{prefix}objcopy"
+
+fast_io_root:str = os.environ.get("FAST_IO_ROOT")
+nagisa_root:str = os.environ.get("NAGISA_ROOT")
+vcpkg_root:str = os.environ.get("VCPKG_ROOT")
+
+current_c_flags = f"-fno-strict-aliasing -m32 -Wno-error -ffreestanding"
+current_cxx_flags = f"{current_c_flags} -std=c++26 -fno-exceptions -fno-rtti -I{fast_io_root}/include -I{nagisa_root}/include -I{vcpkg_root}/installed/x64-windows/include"
+current_ld_flags = f"-m elf_i386 " + ('--no-warn-rwx-segments' if check_gcc_option('-Wl,--no-warn-rwx-segments') else '')
 
 build_dir = f"{project_root}/build"
 
@@ -49,8 +83,8 @@ def make_kernel() -> str:
 		compiler=cc, 
 		linker=linker, 
 		objcopy=objcopy, 
-		c_flags=current_c_flags + " -O3",
-		cxx_flags=current_cxx_flags + " -O3",
+		c_flags=current_c_flags + " -MD -g3 -Og",
+		cxx_flags=current_cxx_flags,
 		ld_flags=current_ld_flags,
 		output_dir=cur_build_dir
 		)
@@ -116,10 +150,11 @@ parser = argparse.ArgumentParser(description='描述你的程序')
 parser.add_argument('--clean', action='store_true', help='清理编译文件')
 parser.add_argument('-i', '--install', action='store_true', help='安装程序')
 parser.add_argument('-q', '--qemu',  action='store_true', help='运行程序')
+parser.add_argument('-g', '--gdb',  action='store_true', help='调试程序')
 parser.add_argument('--simulator', type=str, default=f"qemu-system-i386", help='模拟器')
 parser.add_argument('--cpus', type=int, default=2, help='CPU数量')
 parser.add_argument('--prefix', type=str, default=f"{project_root}/install", help='安装路径')
-
+parser.add_argument('--toolchains', type=str, default=None, help='工具链路径')
 
 # 解析参数
 args = parser.parse_args()
@@ -137,7 +172,8 @@ if args.install:
 	exit(0)
 
 if args.qemu:
-	cmd = qemu(args.simulator, args.cpus)
+	flags = "-S -gdb tcp::26000" if args.gdb else ""
+	cmd = qemu(args.simulator, args.cpus, flags)
 	print(cmd.replace("&&", "\n"))
 	time.sleep(1)
 	os.system(cmd)

@@ -19,57 +19,38 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bio.c" />
-    <ClCompile Include="console.c" />
-    <ClCompile Include="exec.c" />
-    <ClCompile Include="file.c" />
-    <ClCompile Include="fs.c" />
-    <ClCompile Include="ide.c" />
-    <ClCompile Include="ioapic.c" />
-    <ClCompile Include="kalloc.c" />
-    <ClCompile Include="kbd.c" />
-    <ClCompile Include="lapic.c" />
-    <ClCompile Include="log.c" />
-    <ClCompile Include="main.c" />
-    <ClCompile Include="mp.c" />
-    <ClCompile Include="picirq.c" />
-    <ClCompile Include="pipe.c" />
-    <ClCompile Include="proc.c" />
-    <ClCompile Include="sleeplock.c" />
-    <ClCompile Include="spinlock.c" />
-    <ClCompile Include="string.c" />
-    <ClCompile Include="syscall.c" />
-    <ClCompile Include="sysfile.c" />
-    <ClCompile Include="sysproc.c" />
-    <ClCompile Include="trap.c" />
-    <ClCompile Include="uart.c" />
-    <ClCompile Include="vm.c" />
-    <ClCompile Include="visual_memory.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="entry.S" />
-    <None Include="entryother.S" />
-    <None Include="initcode.S" />
-    <None Include="kernel.ld" />
-    <None Include="make.py" />
-    <None Include="swtch.S" />
-    <None Include="trapasm.S" />
-    <None Include="vectors.pl" />
-    <None Include="__init__.py" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="kernel_allocate.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="kernel_allocate.h" />
+    <ClInclude Include="environment.h" />
+    <ClInclude Include="memmod.h" />
+    <ClInclude Include="page.h" />
+    <ClInclude Include="page\detail\basic\address_iterate.h" />
+    <ClInclude Include="page\detail\basic\directory.h" />
+    <ClInclude Include="page\detail\basic\entry.h" />
+    <ClInclude Include="page\detail\basic\environment.h" />
+    <ClInclude Include="page\detail\basic\mode.h" />
+    <ClInclude Include="page\detail\basic\page.h" />
+    <ClInclude Include="page\detail\basic\selector.h" />
+    <ClInclude Include="page\detail\basic\table.h" />
+    <ClInclude Include="page\detail\environment.h" />
+    <ClInclude Include="page\detail\flatten.h" />
+    <ClInclude Include="page\environment.h" />
+    <ClInclude Include="page\export.h" />
+    <ClInclude Include="page\page.h" />
+    <ClInclude Include="segment.h" />
+    <ClInclude Include="segment\environment.h" />
+    <ClInclude Include="segment\export.h" />
+    <ClInclude Include="segment\segment.h" />
+    <ClInclude Include="segment\detail\descriptor.h" />
+    <ClInclude Include="segment\detail\enum.h" />
+    <ClInclude Include="segment\detail\environment.h" />
+    <ClInclude Include="segment\detail\table.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{E693F192-600E-4F60-BA28-5843F47A1616}</ProjectGuid>
+    <ProjectGuid>{c8d99f86-e4a9-454d-996f-8122230357aa}</ProjectGuid>
     <RootNamespace>boot</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>kernel</ProjectName>
+    <ProjectName>xv</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -106,24 +87,28 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VS_PROP_ROOT)\nagisa.props" />
-    <Import Project="..\extern\fast_io.props" />
+    <Import Project="..\..\extern\fast_io.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VS_PROP_ROOT)\nagisa.props" />
-    <Import Project="..\extern\fast_io.props" />
+    <Import Project="..\..\extern\fast_io.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VS_PROP_ROOT)\nagisa.props" />
-    <Import Project="..\extern\fast_io.props" />
+    <Import Project="..\..\extern\fast_io.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VS_PROP_ROOT)\nagisa.props" />
-    <Import Project="..\extern\fast_io.props" />
+    <Import Project="..\..\extern\fast_io.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>

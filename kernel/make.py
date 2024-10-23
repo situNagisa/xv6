@@ -2,16 +2,19 @@ import os
 import glob
 from typing import List
 
-current_c_flags = f"-fno-pic -static -fno-builtin -m32 -fno-omit-frame-pointer -fno-exceptions -fno-stack-protector -fno-stack-protector -fno-pie -no-pie "
+current_c_flags = f"-fno-pic -static -fno-builtin -m32 -fno-omit-frame-pointer -fno-exceptions -fno-stack-protector -fno-pie -no-pie "
 current_cxx_flags = f"{current_c_flags} -x c++" 
 current_ld_flags = f""
 current_dir = os.path.relpath(os.path.dirname(os.path.abspath(__file__)), os.curdir)
 
 sources = []
 sources += glob.glob(os.path.join(current_dir, '*.c'))
-sources += glob.glob(os.path.join(current_dir, '*.cpp'))
 sources += [ f"{current_dir}/{source}" for source in "swtch.S trapasm.S entry.S".split(" ") ]
-sources.remove(os.path.join(current_dir, 'kalloc.c'))
+if os.environ.get('USE_CPP'):
+	sources.remove(os.path.join(current_dir, 'kalloc.c'))
+	sources += glob.glob(os.path.join(current_dir, '*.cpp'))
+	sources.remove(os.path.join(current_dir, 'visual_memory.cpp'))
+
 
 def entryother(project_root:str, compiler:str, linker:str, objcopy:str, c_flags:str, ld_flags:str, output_dir:str) -> str:
 	input_file = f"{current_dir}/entryother.S"
@@ -67,7 +70,7 @@ def make_kernel(project_root:str, compiler:str, linker:str, objcopy:str, c_flags
 		cmd += f" && {obj_cmd}"
 		objs.append(file)
 	for source in sources_cxx:
-		obj_cmd, file = kernel_cxx_rule(project_root, compiler, cxx_flags, output_dir, source)
+		obj_cmd, file = kernel_cxx_rule(project_root, f"x86_64-elf-{compiler}", f"{c_flags} {cxx_flags}", output_dir, source)
 		cmd += f" && {obj_cmd}"
 		objs.append(file)
 	for source in sources_asm:
@@ -79,7 +82,8 @@ def make_kernel(project_root:str, compiler:str, linker:str, objcopy:str, c_flags
 	initcode_cmd, initcode_file = initcode(project_root, compiler, linker, objcopy, c_flags, ld_flags, output_dir)
 	cmd += f" && {initcode_cmd}"
 	cmd += f" && cd {output_dir}"
-	cmd += f" && {linker} {ld_flags} {current_ld_flags} -T {os.path.abspath(current_dir)}/kernel.ld -o {os.path.abspath(output_file)} {' '.join([os.path.abspath(obj) for obj in objs])} -b binary {os.path.basename(initcode_file)} {os.path.basename(entryother_file)}"
+	cur_dir = os.path.join(os.path.abspath(os.path.curdir), output_dir)
+	cmd += f" && {linker} {ld_flags} {current_ld_flags} -T {os.path.relpath(os.path.abspath(current_dir), cur_dir)}/kernel.ld -o {os.path.relpath(os.path.abspath(output_file), cur_dir)} {' '.join([os.path.relpath(os.path.abspath(obj), cur_dir) for obj in objs])} -b binary {os.path.basename(initcode_file)} {os.path.basename(entryother_file)}"
 	cmd += f" && cd -"
 	return (cmd, output_file)
 
