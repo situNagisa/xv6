@@ -30,6 +30,7 @@
     <ClInclude Include="page\detail\basic\page.h" />
     <ClInclude Include="page\detail\basic\selector.h" />
     <ClInclude Include="page\detail\basic\table.h" />
+    <ClInclude Include="page\detail\chunk_by_address.h" />
     <ClInclude Include="page\detail\environment.h" />
     <ClInclude Include="page\detail\flatten.h" />
     <ClInclude Include="page\environment.h" />

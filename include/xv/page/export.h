@@ -9,6 +9,7 @@
 #include "./detail/basic/directory.h"
 
 #include "./detail/flatten.h"
+#include "./detail/chunk_by_address.h"
 
 #include "./environment.h"
 
@@ -28,7 +29,7 @@ using details::sentinel;
 using details::sentinel_t;
 using details::address_iterable;
 using details::address_range;
-using details::address_range_t;
+using details::address_range_view;
 
 using details::target;
 using details::target_t;
@@ -50,5 +51,6 @@ using details::primary_page_directory;
 using details::secondary_page_directory;
 
 using details::flatten;
+using details::chunk_by_address;
 
 NAGISA_BUILD_LIB_END

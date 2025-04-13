@@ -15,7 +15,10 @@
 
 #include <boost/stl_interfaces/iterator_interface.hpp>
 
+#include <nagisa/stl_freestanding/utility/utility.h>
 #include <nagisa/bit/bit.h>
+#include <nagisa/memmod/layout/layout.h>
+#include <nagisa/concept/concept.h>
 
 #include <fast_io.h>
 

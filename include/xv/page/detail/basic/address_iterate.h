@@ -61,13 +61,16 @@ concept address_iterable = requires(T t, void const* address)
 	sentinel(t, address);
 };
 
+template<address_iterable T>
+using address_range_view = ::std::ranges::subrange<iterator_t<T>, sentinel_t<T>>;
+
 struct address_range_adaptor_closure : ::std::ranges::range_adaptor_closure<address_range_adaptor_closure>
 {
 	constexpr address_range_adaptor_closure(void const* i, void const* s) noexcept : _iterator(i), _sentinel(s) {}
 
 	constexpr decltype(auto) operator()(address_iterable auto&& range) const noexcept
 	{
-		return ::std::ranges::subrange(
+		return address_range_view(
 			iterator(NAGISA_STL_FREESTANDING_UTILITY_FORWARD(range), _iterator),
 			sentinel(NAGISA_STL_FREESTANDING_UTILITY_FORWARD(range), _sentinel)
 		);
@@ -88,9 +91,6 @@ inline constexpr struct
 		return address_range_adaptor_closure{ begin, end };
 	}
 }address_range{};
-
-template<class T>
-using address_range_t = decltype(address_range(::std::declval<T&>(), ::std::declval<void const*>(), ::std::declval<void const*>()));
 
 NAGISA_BUILD_LIB_DETAIL_END
 

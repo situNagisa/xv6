@@ -26,6 +26,7 @@ using details::primary_directory_entry;
 using details::primary_page_directory;
 
 
-using details::page_allocator;
+using details::allocator_unlocked;
+using details::allocator;
 
 NAGISA_BUILD_LIB_END

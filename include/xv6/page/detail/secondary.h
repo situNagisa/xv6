@@ -52,9 +52,41 @@ __attribute__((packed))
 #	pragma pack()
 #endif
 static_assert(::xv::pages::table_entry<table_entry>);
+struct page_table : ::fast_io::array<table_entry, 1 << ::xv::pages::page_trait<::xv::pages::page_mode::secondary>::table_bit_width>
+{
+private:
+	using self_type = page_table;
+	using base_type = ::fast_io::array<table_entry, 1 << ::xv::pages::page_trait<::xv::pages::page_mode::secondary>::table_bit_width>;
+public:
+	using entry_type = table_entry;
 
-using page_table = ::fast_io::array<table_entry, 1 << ::xv::pages::page_trait<::xv::pages::page_mode::secondary>::table_bit_width>;
+	constexpr auto iterator(void const* address) noexcept
+	{
+		return base_type::begin() + ::xv::pages::make_page_selector<entry_type::mode>(address).table;
+	}
+	constexpr auto iterator(void const* address) const noexcept
+	{
+		return base_type::begin() + ::xv::pages::make_page_selector<entry_type::mode>(address).table;
+	}
+	constexpr auto sentinel(void const* address) noexcept
+	{
+		return base_type::begin() + ::xv::pages::make_page_selector<entry_type::mode>(
+			::std::bit_cast<void const*>(::nagisa::bits::round_ceil<::xv::pages::page_trait<entry_type::mode>::page_bit_width>(
+				::std::bit_cast<::std::uintptr_t>(address)
+			))
+		).table;
+	}
+	constexpr auto sentinel(void const* address) const noexcept
+	{
+		return base_type::begin() + ::xv::pages::make_page_selector<entry_type::mode>(
+			::std::bit_cast<void const*>(::nagisa::bits::round_ceil<::xv::pages::page_trait<entry_type::mode>::page_bit_width>(
+				::std::bit_cast<::std::uintptr_t>(address)
+			))
+		).table;
+	}
+};
 static_assert(::xv::pages::page_table<page_table>);
+static_assert(::xv::pages::address_iterable<page_table>);
 
 
 struct secondary_directory_entry : basic_entry<secondary_directory_entry, ::xv::pages::page_mode::secondary>
@@ -90,7 +122,44 @@ public:
 	}
 };
 static_assert(::xv::pages::secondary_directory_entry<secondary_directory_entry>);
-using secondary_page_directory = ::fast_io::array<secondary_directory_entry, 1 << ::xv::pages::page_trait<::xv::pages::page_mode::secondary>::directory_bit_width>;
+struct secondary_page_directory : ::fast_io::array<secondary_directory_entry, 1 << ::xv::pages::page_trait<::xv::pages::page_mode::secondary>::directory_bit_width>
+{
+private:
+	using self_type = secondary_page_directory;
+	using base_type = ::fast_io::array<secondary_directory_entry, 1 << ::xv::pages::page_trait<::xv::pages::page_mode::secondary>::directory_bit_width>;
+public:
+	using entry_type = secondary_directory_entry;
+
+	constexpr auto iterator(void const* address) noexcept
+	{
+		return base_type::begin() + ::xv::pages::make_page_selector<entry_type::mode>(address).directory;
+	}
+	constexpr auto iterator(void const* address) const noexcept
+	{
+		return base_type::begin() + ::xv::pages::make_page_selector<entry_type::mode>(address).directory;
+	}
+	constexpr auto sentinel(void const* address) noexcept
+	{
+		return base_type::begin() + ::xv::pages::make_page_selector<entry_type::mode>(
+			::std::bit_cast<void const*>(
+				::nagisa::bits::round_ceil<::xv::pages::page_trait<entry_type::mode>::page_bit_width + ::xv::pages::page_trait<entry_type::mode>::table_bit_width>(
+					::std::bit_cast<::std::uintptr_t>(address)
+				)
+			)
+		).directory;
+	}
+	constexpr auto sentinel(void const* address) const noexcept
+	{
+		return base_type::begin() + ::xv::pages::make_page_selector<entry_type::mode>(
+			::std::bit_cast<void const*>(
+				::nagisa::bits::round_ceil<::xv::pages::page_trait<entry_type::mode>::page_bit_width + ::xv::pages::page_trait<entry_type::mode>::table_bit_width>(
+					::std::bit_cast<::std::uintptr_t>(address)
+				)
+			)
+		).directory;
+	}
+};
 static_assert(::xv::pages::secondary_page_directory<secondary_page_directory>);
+static_assert(::xv::pages::address_iterable<secondary_page_directory>);
 
 NAGISA_BUILD_LIB_DETAIL_END

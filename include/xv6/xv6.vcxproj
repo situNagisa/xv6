@@ -26,7 +26,9 @@
     <ClInclude Include="memmod.h" />
     <ClInclude Include="page\detail\allocator.h" />
     <ClInclude Include="page\detail\entry.h" />
+    <ClInclude Include="page\detail\kernel_page_directory.h" />
     <ClInclude Include="page\detail\kernel_transformer.h" />
+    <ClInclude Include="page\detail\map.h" />
     <ClInclude Include="page\detail\page.h" />
     <ClInclude Include="page\detail\primary.h" />
     <ClInclude Include="page\detail\secondary.h" />

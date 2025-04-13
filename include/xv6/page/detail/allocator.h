@@ -51,17 +51,17 @@ struct free_page_list : ::std::ranges::view_interface<free_page_list<Mode>>
 
 	using iterator_type = free_page_iterator<Mode>;
 
-	constexpr void push_front(page_type& value) noexcept
+	constexpr void push_front(page_type* value) noexcept
 	{
-		details::set_next_page<Mode>(value, *_data);
-		_data = ::std::addressof(value);
+		details::set_next_page<Mode>(*value, *_data);
+		_data = value;
 	}
-	constexpr auto&& pop_front() noexcept
+	constexpr auto pop_front() noexcept
 	{
 		auto next = ::std::addressof(details::get_next_page<Mode>(*_data));
 		::std::swap(_data, next);
 
-		return *next;
+		return next;
 	}
 	constexpr bool empty() const noexcept { return _data == nullptr; }
 
@@ -72,7 +72,7 @@ struct free_page_list : ::std::ranges::view_interface<free_page_list<Mode>>
 };
 
 
-struct page_allocator
+struct allocator_unlocked
 {
 	using list_type = free_page_list<::xv::pages::page_mode::secondary>;
 	using page_type = typename list_type::page_type;
@@ -89,20 +89,59 @@ struct page_allocator
 		return _free_list.empty();
 	}
 
-	auto&& allocate() noexcept
+	auto allocate() noexcept
 	{
 		if (empty())
 			::fast_io::fast_terminate();
-		auto&& result = _free_list.pop_front();
-		return result;
+		return  _free_list.pop_front();
 	}
 
-	void deallocate(page_type& page) noexcept
+	void deallocate(page_type* page) noexcept
 	{
 		_free_list.push_front(page);
 	}
 
 	list_type _free_list{};
+};
+
+template<class Mutex>
+struct allocator : allocator_unlocked
+{
+	using base_type = allocator_unlocked;
+	using mutex_type = Mutex;
+	
+	void reserve_range(auto const& pages) noexcept
+		requires requires { base_type::reserve_range(pages); }
+	{
+		_mutex.lock();
+		base_type::reserve_range(pages);
+		_mutex.unlock();
+	}
+
+	constexpr bool empty() const noexcept
+	{
+		_mutex.lock();
+		auto result = _free_list.empty();
+		_mutex.unlock();
+		return result;
+	}
+
+	decltype(auto) allocate() noexcept
+	{
+		_mutex.lock();
+		auto result = base_type::allocate();
+		_mutex.unlock();
+		return result;
+	}
+
+	void deallocate(page_type* page) noexcept
+	{
+		_mutex.lock();
+		_free_list.push_front(page);
+		_mutex.unlock();
+	}
+
+	mutex_type _mutex{};
 };
 
 NAGISA_BUILD_LIB_DETAIL_END

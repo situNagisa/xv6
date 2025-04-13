@@ -112,6 +112,11 @@ inline constexpr struct flatten_directory_cpo
 		}
 	};
 
+	constexpr XV_PAGE_STATIC decltype(auto) operator()() XV_PAGE_CONST noexcept
+	{
+		return adaptor_closure{};
+	}
+
 	constexpr XV_PAGE_STATIC decltype(auto) operator()(auto&& range) XV_PAGE_CONST noexcept
 		requires requires{ adaptor_closure{}(NAGISA_STL_FREESTANDING_UTILITY_FORWARD(range)); }
 	{
